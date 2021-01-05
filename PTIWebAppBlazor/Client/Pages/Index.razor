@@ -1,7 +1,104 @@
 ﻿@page "/"
+@*@layout or use in app.razor client*@
+@inherits MyBaseComponent;
+@using Microsoft.AspNetCore.WebUtilities;
+@using Microsoft.Extensions.Primitives;
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+@inject IWebAssemblyHostEnvironment hostEnv;
+@inject NavigationManager navManager;
+@inject IConfiguration Configuration;
+@inject ILogger<Index> logger;
+@inject Blazored.LocalStorage.ILocalStorageService ls;
 
-<h1>Hello, world!</h1>
+<h1>PTI web app</h1>
+coding. @Configuration["insurance_name"]
+<p>Current token: @token</p>
+<h1>
+    ApiUrl: @Configuration["ApiUrl"]
+</h1>
+<SurveyPrompt Title="PTI survey?" />
 
-Welcome to your new app.
+@code{
+    private string token = "";
+    protected override void OnInitialized()
+    {
+        @*StringValues initToken;
+            https://stackoverflow.com/questions/48188934/why-is-stringvalues-used-for-request-query-values
+        *@
+        logger.LogWarning("index OnInitialized");
+    }
+    /// <summary>
+    /// Blazor Server apps that prerender their content call OnInitializedAsync twice
+    /// => Web Asemmbly only run once. So maybe need use OnAfterRenderAsync if use Blazor Server apps
+    /// check Component lifeCycle for more detail
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+        @*StringValues initToken;
+            https://stackoverflow.com/questions/48188934/why-is-stringvalues-used-for-request-query-values
+        *@
+        logger.LogWarning("index OnInitializedAsync");
+        var uri = navManager.ToAbsoluteUri(navManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("token", out StringValues initToken))
+        {
+            @*token = Convert.ToInt32(initToken);*@
+        token = initToken.ToString();
+        await ls.SetItemAsync<string>("pti_token", token);
+    }
+    else
+    {
+        var saveToken = await ls.GetItemAsync<string>("pti_token");
+        bool kq = String.IsNullOrEmpty(saveToken);
+        token = kq ? "default_token" : saveToken;
+        logger.LogWarning("token is {aa} => {t}", kq, token);
+    }
+    //logger.LogWarning("token is {a} {t}", token, token);
+    logger.LogInformation("token is {a} {t}", token, token);
+    if (hostEnv.IsDevelopment())
+    {
+        logger.LogInformation("In Debug");
+    }
+    else if (hostEnv.IsStaging())
+    {
+        logger.LogInformation("In Staging");
+    }else
+    {
+        bool isEqual = hostEnv.IsEnvironment("Staging2");
+        logger.LogInformation("In Debug isEqual {isEqual}", isEqual);
+    }
+}
+}
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@*
+    solution 2 to use Route parameters ==> maybe better, clean code
+    @page "/{token?}"
+    //@page "/{token?:int}"can use Route constraints => enforces int
+    //can;t use Route constraints string because default parameters is string
+    //=> not need enforces string
+
+    <h1>Blazor is @Text!</h1>
+
+    @code {
+        [Parameter]
+        public string Token { get; set; }
+        //use OnParametersSet is better
+        protected override void OnInitialized()
+        {
+            Token = Token ?? "token_default";
+        }
+        //Use on OnParametersSet instead of OnInitialized to permit app navigation to the same component
+        with a different optional parameter value. Based on the preceding example,
+        use OnParametersSet when the user should be able to navigate from /RouteParameter to /RouteParameter/amazing
+        or from /RouteParameter/amazing to /RouteParameter:
+        protected override void OnParametersSet()
+            {
+                Token = Token ?? "token_default";
+            }
+        }
+*@
+
+@*Catch-all route parameters
+    https://docs.microsoft.com/en-us/aspnet/core/blazor/fundamentals/routing?view=aspnetcore-5.0#catch-all-route-parameters
+     /catch-all/this/is/a/test with a route template of /catch-all/{*pageRoute}, the value of PageRoute is set to this/is/a/test
+*@

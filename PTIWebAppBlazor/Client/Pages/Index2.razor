@@ -1,0 +1,19 @@
+﻿@page "/index5"
+@using Microsoft.AspNetCore.WebUtilities;
+@using Microsoft.Extensions.Primitives;
+@inject NavigationManager navManager
+<h1>Component1</h1>
+<p>Current count: @currentCount</p>
+@code {
+    private int currentCount = 0;
+    protected override void OnInitialized()
+    {
+        StringValues initCount;
+        var uri = navManager.ToAbsoluteUri(navManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("initialCount", out initCount))
+        {
+            currentCount = Convert.ToInt32(initCount);
+        }
+
+    }
+}

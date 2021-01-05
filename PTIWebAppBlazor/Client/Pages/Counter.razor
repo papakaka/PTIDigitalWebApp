@@ -1,16 +1,48 @@
 ﻿@page "/counter"
-
+@using Microsoft.AspNetCore.WebUtilities;
+@using Microsoft.Extensions.Primitives;
+@inject NavigationManager navManager
+@implements System.IDisposable
 <h1>Counter</h1>
 
-<p>Current count: @currentCount</p>
+<p>Current count test: @currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
 @code {
+
     private int currentCount = 0;
+    protected override void OnInitialized()
+    {
+        StringValues initCount;
+        var uri = navManager.ToAbsoluteUri(navManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("initialCount", out initCount))
+        {
+            currentCount = Convert.ToInt32(initCount);
+        }
+
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(25000);
+        currentCount = 6789;
+        await Task.Delay(5000);
+    }
+    public void Dispose()
+    {
+    }
 
     private void IncrementCount()
     {
         currentCount++;
+        NavigateToComponent();
+    }
+    private void NavigateToComponent()
+    {
+        var query = new Dictionary<string, string> {
+        { "firstname", "Jignesh" },
+        { "lastname", "Trivedi" }
+    };
+        navManager.NavigateTo(QueryHelpers.AddQueryString("/anotherexp", query));
     }
 }

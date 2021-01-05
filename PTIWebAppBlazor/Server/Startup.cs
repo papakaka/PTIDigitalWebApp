@@ -6,7 +6,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
-
+using Blazored.LocalStorage;
+/// <summary>
+/// https://docs.microsoft.com/en-us/aspnet/core/blazor/project-structure?view=aspnetcore-5.0
+/// </summary>
 namespace PTIWebAppBlazor.Server
 {
     public class Startup
@@ -25,6 +28,8 @@ namespace PTIWebAppBlazor.Server
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+            ///
+            services.AddBlazoredLocalStorage();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,7 +46,7 @@ namespace PTIWebAppBlazor.Server
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            //app.UsePathBase("/pti/wwwroot/");
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
@@ -53,6 +58,7 @@ namespace PTIWebAppBlazor.Server
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
                 endpoints.MapFallbackToFile("index.html");
+               
             });
         }
     }

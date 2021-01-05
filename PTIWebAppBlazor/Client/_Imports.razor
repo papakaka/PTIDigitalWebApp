@@ -1,4 +1,10 @@
-﻿@using System.Net.Http
+﻿@*
+    https://docs.microsoft.com/en-us/aspnet/core/blazor/components/?view=aspnetcore-5.0#partial-class-support
+    @using directives in the _Imports.razor file are only applied
+    to Razor files (.razor), not C# files (.cs).
+    The _import.razor file will include all the using statements in every page/component.
+*@
+@using System.Net.Http
 @using System.Net.Http.Json
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
@@ -8,3 +14,10 @@
 @using Microsoft.JSInterop
 @using PTIWebAppBlazor.Client
 @using PTIWebAppBlazor.Client.Shared
+
+@*
+    custom
+*@
+@using PTIWebAppBlazor.Shared.Component.Base;
+@using Microsoft.Extensions.Configuration;
+@using Microsoft.Extensions.Logging;
