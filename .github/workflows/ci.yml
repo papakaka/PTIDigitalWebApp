@@ -1,4 +1,7 @@
 name: 'Publish application'
+env:
+  PUBLISH_DIR: PTIWebAppBlazor/Client/bin/Release/net5.0/publish/wwwroot
+
 on: push
 
 jobs:
@@ -22,6 +25,12 @@ jobs:
         - name: Publish
           run: dotnet publish PTIWebAppBlazor/Client/PTIWebAppBlazor.Client.csproj -c Release
 
+        - name: Rewrite base href
+          uses: SteveSandersonMS/ghaction-rewrite-base-href@v1
+          with:
+            html_path: ${{ env.PUBLISH_DIR }}/index.html
+            base_href: /BlazorOnGitHubPages/  
+
         # Publish the website
         - name: GitHub Pages action
           if: ${{ github.ref == 'refs/heads/master' }} # Publish only when the push is on master
@@ -29,7 +38,7 @@ jobs:
           with:
             github_token: ${{ secrets.PUBLISH_TOKEN }}
             publish_branch: gh-pages
-            publish_dir: PTIWebAppBlazor/Client/bin/Release/net5.0/publish/wwwroot
+            publish_dir: ${{ env.PUBLISH_DIR }}
             allow_empty_commit: false
             keep_files: false
             force_orphan: true
