@@ -29,7 +29,14 @@ jobs:
           uses: SteveSandersonMS/ghaction-rewrite-base-href@v1
           with:
             html_path: ${{ env.PUBLISH_DIR }}/index.html
-            base_href: /BlazorOnGitHubPages/  
+            base_href: '/PTIWebAppBlazor/'  #reposit name in github, because use sub folder
+
+        # copy index.html to 404.html to serve the same file when a file is not found
+        - name: copy index.html to 404.html
+          run: cp r${{ env.PUBLISH_DIR }}/index.html ${{ env.PUBLISH_DIR }}/404.html
+        # add .nojekyll file to tell GitHub pages to not treat this as a Jekyll project. (Allow files and folders starting with an underscore)
+        - name: Add .nojekyll file
+          run: touch ${{ env.PUBLISH_DIR }}/.nojekyll    
 
         # Publish the website
         - name: GitHub Pages action
