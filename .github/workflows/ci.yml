@@ -25,15 +25,13 @@ jobs:
         - name: Publish
           run: dotnet publish PTIWebAppBlazor/Client/PTIWebAppBlazor.Client.csproj -c Release
 
-        - name: Rewrite base href
-          uses: SteveSandersonMS/ghaction-rewrite-base-href@v1
-          with:
-            html_path: ${{ env.PUBLISH_DIR }}/index.html
-            base_href: '/PTIWebAppBlazor/'  #reposit name in github, because use sub folder
+        # changes the base-tag in index.html from '/' to 'BlazorGitHubPagesDemo' to match GitHub Pages repository subdirectory
+        - name: Change base-tag in index.html from / to PTIDigitalWebApp
+          run: sed -i 's/<base href="\/" \/>/<base href="\/PTIDigitalWebApp\/" \/>/g' ${{ env.PUBLISH_DIR }}/index.html
 
         # copy index.html to 404.html to serve the same file when a file is not found
         - name: copy index.html to 404.html
-          run: cp r${{ env.PUBLISH_DIR }}/index.html ${{ env.PUBLISH_DIR }}/404.html
+          run: cp ${{ env.PUBLISH_DIR }}/index.html ${{ env.PUBLISH_DIR }}/404.html
         # add .nojekyll file to tell GitHub pages to not treat this as a Jekyll project. (Allow files and folders starting with an underscore)
         - name: Add .nojekyll file
           run: touch ${{ env.PUBLISH_DIR }}/.nojekyll    
